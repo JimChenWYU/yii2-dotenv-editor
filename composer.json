@@ -8,7 +8,16 @@
             "email": "imjimchen@163.com"
         }
     ],
-    "require": {},
+    "require": {
+        "php": ">=7.1",
+        "yiisoft/yii2": "~2.0",
+        "sixlive/dotenv-editor": "^1.2",
+        "bower-asset/vue": "^2.6"
+    }
+    ,
+    "require-dev": {
+        "roave/security-advisories": "dev-master"
+    },
     "autoload": {
         "psr-4": {
             "JimChen\\Yii2DotenvEditor\\": "src"
