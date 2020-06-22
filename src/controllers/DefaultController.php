@@ -35,7 +35,7 @@ class DefaultController extends Controller
     {
         $data['values'] = $this->editor->getContent();
         try {
-            $data['backups'] = $this->editor->getBackupVersions();
+            $data['backups'] = $this->editor->getBackupVersions(SORT_DESC);
         } catch (DotEnvException $e) {
             $data['backups'] = false;
         }
