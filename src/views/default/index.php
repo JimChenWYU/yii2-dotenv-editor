@@ -227,7 +227,7 @@
                                         <a class="btn btn-info" href="<?=$url . '/download/' . $backup['unformatted']?>">
                                         <span class="fa fa-download" title="<?=Yii::t('dotenv', 'backup_table_options_download')?>"></span>
                                         </a>
-                                        <a onclick="return confirm('Are you sure?')" class="btn btn-danger" href="<?= $url.'/deletebackup/'.$backup["unformatted"]?>" title="<?=Yii::t('dotenv', 'backup_table_options_delete')?>">
+                                        <a onclick="return confirm('<?=Yii::t('dotenv', 'warning_operating')?>')" class="btn btn-danger" href="<?= $url.'/deletebackup/'.$backup["unformatted"]?>" title="<?=Yii::t('dotenv', 'backup_table_options_delete')?>">
                                         <span class="fa fa-trash"></span>
                                         </a>
                                     </td>
@@ -266,7 +266,7 @@
 
                                     <button type="button" class="btn btn-default" data-dismiss="modal"><?=Yii::t('dotenv', 'backup_modal_close')?></button>
 
-                                    <a onclick="return confirm('are you sure?')" href="<?= $url . '/deletebackup/'.$backup["unformatted"]?>" class="btn btn-danger">
+                                    <a onclick="return confirm('<?=Yii::t('dotenv', 'warning_operating')?>')" href="<?= $url . '/deletebackup/'.$backup["unformatted"]?>" class="btn btn-danger">
                                     <?=Yii::t('dotenv', 'backup_modal_delete')?>
                                     </a>
                                 </div>
@@ -289,6 +289,11 @@
                                 </span>
                             </p>
                             <form method="post" action="<?= $url . '/upload'?>" enctype="multipart/form-data">
+                            <?php
+                            use yii\helpers\Html;
+                            $request = Yii::$app->getRequest();
+                            echo Html::hiddenInput($request->csrfParam, $request->getCsrfToken());
+                            ?>
                             <div class="form-group">
                                 <label for="backup"><?=Yii::t('dotenv', 'upload_label')?></label>
                                 <input type="file" name="backup">
@@ -433,6 +438,7 @@ new Vue({
                 type: "get",
                 success: function(){
                     vm.showAlert('success', "<?=Yii::t('dotenv', 'backup_created')?>");
+                    vm.setActiveView('<?=Yii::t('dotenv', 'backups')?>')
                 }
             })
         },
@@ -446,7 +452,7 @@ new Vue({
         },
         restoreBackup: function(timestamp){
             var vm = this;
-            if (confirm('are you sure?')) {
+            if (confirm("<?=Yii::t('dotenv', 'warning_operating')?>")) {
                 $.ajax({
                     url: "/<?=$url?>/restore/" + timestamp,
                     type: "get",

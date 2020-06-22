@@ -108,7 +108,7 @@ class DefaultController extends Controller
     public function actionDownload($filename = false)
     {
         if ($filename) {
-            $file = $this->editor->backupPath . $filename . '_env';
+            $file = $this->editor->getBackupPath() . $filename . '_env';
             return $this->download($file, $filename . '.env');
         }
         return $this->download($this->editor->env, '.env');

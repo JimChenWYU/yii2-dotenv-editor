@@ -100,6 +100,7 @@ return [
     'delete_entry'      => 'Delete an entry',
     'backup_created'    => 'New backup was created successfully!',
     'backup_restored'   => 'Backup was restored successfully!',
+	'warning_operating' => 'Are you sure?',
 
     /*
     |--------------------------------------------------------------------------
