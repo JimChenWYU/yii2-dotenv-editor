@@ -357,6 +357,11 @@ new Vue({
             return value
         }
     },
+    mounted: function () {
+        <?php if ($view = Yii::$app->getSession()->getFlash('active-view', false, true)):?>
+        this.setActiveView("<?=$view?>")
+        <?php endif;?>
+    },
     methods: {
         loadEnv: function(){
             var vm = this;
@@ -378,7 +383,7 @@ new Vue({
         },
         setActiveView: function(viewName){
             $.each(this.views, function(key, value){
-                if(value.name == viewName){
+                if(value.name === viewName){
                     value.active = 1;
                 } else {
                     value.active = 0;

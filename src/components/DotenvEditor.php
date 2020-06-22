@@ -2,9 +2,11 @@
 
 namespace JimChen\Yii2DotenvEditor\components;
 
-use JimChen\Yii2DotenvEditor\DotEnvException;
 use Yii;
+use JimChen\Yii2DotenvEditor\DotEnvException;
+use JimChen\Yii2DotenvEditor\models\Backup;
 use yii\base\Component;
+use yii\base\InvalidConfigException;
 use yii\helpers\Json;
 
 /**
@@ -35,8 +37,19 @@ final class DotenvEditor extends Component
      */
     public $autoBackup = true;
 
+    /**
+     * @var int
+     */
+    public $maxBackup = 10;
+
     public function init()
     {
+	    if ($this->env === null) {
+		    throw new InvalidConfigException('Unknown DotenvEditor::class parameter `env`');
+	    }
+	    if ($this->backupPath === null) {
+		    throw new InvalidConfigException('Unknown DotenvEditor::class parameter `backupPath`');
+	    }
         $this->env = Yii::getAlias($this->env);
         $this->backupPath = rtrim(Yii::getAlias($this->backupPath), DIRECTORY_SEPARATOR);
         $this->editor = new \sixlive\DotenvEditor\DotenvEditor();
@@ -109,10 +122,10 @@ final class DotenvEditor extends Component
      * Array contains the formatted and unformatted version of each backup.
      * Throws exception, if no backups were found.
      *
-     * @return array
+     * @return Backup[]
      * @throws DotEnvException
      */
-    public function getBackupVersions()
+    public function getBackupVersions($sort = SORT_ASC)
     {
         $versions = array_diff(scandir($this->backupPath), array('..', '.'));
 
@@ -121,10 +134,21 @@ final class DotenvEditor extends Component
             $count  = 0;
             foreach ($versions as $version) {
                 $part                          = explode("_", $version);
-                $output[$count]['formatted']   = date("Y-m-d H:i:s", (int) $part[0]);
-                $output[$count]['unformatted'] = $part[0];
+                $output[$count] = new Backup([
+                    'formatted' => date("Y-m-d H:i:s", (int) $part[0]),
+                    'unformatted' => $part[0],
+                ]);
                 $count++;
             }
+	        usort($output, function (Backup $a, Backup $b) use ($sort) {
+		        if ($a->unformatted === $b->unformatted) {
+			        return 0;
+		        }
+		        if ($sort === SORT_ASC) {
+		            return ($a->unformatted < $b->unformatted) ? -1 : 1;
+		        }
+		        return ($a->unformatted < $b->unformatted) ? 1 : -1;
+	        });
             return $output;
         }
         throw new DotEnvException(Yii::t('dotenv', 'no_backups_available'), 0);
@@ -151,6 +175,11 @@ final class DotenvEditor extends Component
      */
     public function createBackup()
     {
+        if ($this->getBackupCount() >= (int)$this->maxBackup) {
+            $oldestBackup = $this->getOldestBackup();
+            $this->deleteBackup($oldestBackup->unformatted);
+        }
+
         return copy(
             $this->env,
             $this->getBackupPath() . time() . "_env"
@@ -191,7 +220,7 @@ final class DotenvEditor extends Component
                 $file = $this->getFile($timestamp);
             }
         } else {
-            $file = $this->getFile($this->getLatestBackup()['unformatted']);
+            $file = $this->getFile($this->getLatestBackup()->unformatted);
         }
 
         return copy($file, $this->env);
@@ -219,7 +248,7 @@ final class DotenvEditor extends Component
     /**
      * Returns the timestamp of the latest version.
      *
-     * @return int|mixed
+     * @return Backup
      */
     protected function getLatestBackup()
     {
@@ -231,6 +260,33 @@ final class DotenvEditor extends Component
             }
         }
         return $latestBackup;
+    }
+
+    /**
+     * Returns the timestamp of the oldest version.
+     *
+     * @return Backup
+     */
+    protected function getOldestBackup()
+    {
+        $backups      = $this->getBackupVersions();
+        $oldestBackup = PHP_INT_MAX;
+        foreach ($backups as $backup) {
+            if ($backup < $oldestBackup) {
+                $oldestBackup = $backup;
+            }
+        }
+        return $oldestBackup;
+    }
+
+    /**
+     * Counts all backups
+     *
+     * @return int
+     */
+    protected function getBackupCount()
+    {
+        return count(array_diff(scandir($this->backupPath), array('..', '.')));
     }
 
     /**

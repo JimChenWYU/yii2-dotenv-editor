@@ -35,7 +35,7 @@ class DefaultController extends Controller
     {
         $data['values'] = $this->editor->getContent();
         try {
-            $data['backups'] = $this->editor->getBackupVersions();
+            $data['backups'] = $this->editor->getBackupVersions(SORT_DESC);
         } catch (DotEnvException $e) {
             $data['backups'] = false;
         }
@@ -132,10 +132,12 @@ class DefaultController extends Controller
     public function actionCreatebackup()
     {
         $this->editor->createBackup();
-        Yii::$app->getSession()->setFlash(
+	    Yii::$app->getSession()->setFlash(
+	    	'active-view',
+		    Yii::t('dotenv', 'backups'));
+	    Yii::$app->getSession()->setFlash(
             'dotenv',
-            Yii::t('dotenv', 'controller_backup_created')
-        );
+            Yii::t('dotenv', 'controller_backup_created'));
         return $this->redirect(Yii::$app->getRequest()->getReferrer());
     }
 
@@ -147,7 +149,7 @@ class DefaultController extends Controller
     public function actionDeletebackup($timestamp)
     {
         $this->editor->deleteBackup($timestamp);
-        Yii::$app->getSession()->setFlash(
+        Yii::$app->getSession()->addFlash(
             'dotenv',
             Yii::t('dotenv', 'controller_backup_deleted')
         );

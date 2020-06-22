@@ -3,11 +3,10 @@
 namespace JimChen\Yii2DotenvEditor;
 
 use Yii;
+use yii\base\BootstrapInterface;
 use yii\base\InvalidConfigException;
 use yii\i18n\PhpMessageSource;
 use yii\web\Application;
-use yii\base\BootstrapInterface;
-use JimChen\Yii2DotenvEditor\components\DotenvEditor;
 
 class Module extends \yii\base\Module implements BootstrapInterface
 {
@@ -70,22 +69,8 @@ class Module extends \yii\base\Module implements BootstrapInterface
 	 */
 	protected function createDotenvEditor()
 	{
-		if (!isset($this->dotenvOptions['env'])) {
-			throw new InvalidConfigException('Unknown DotenvEditor::class parameter `env`');
-		}
-		if (!isset($this->dotenvOptions['backupPath'])) {
-			throw new InvalidConfigException('Unknown DotenvEditor::class parameter `backupPath`');
-		}
-		if (!isset($this->dotenvOptions['autoBackup'])) {
-			throw new InvalidConfigException('Unknown DotenvEditor::class parameter `autoBackup`');
-		}
-
-		Yii::$app->set('dotenveditor', [
-			'class' => DotenvEditor::class,
-			'env' => $this->dotenvOptions['env'],
-			'backupPath' => $this->dotenvOptions['backupPath'],
-			'autoBackup' => $this->dotenvOptions['autoBackup'],
-		]);
+		$this->dotenvOptions['class'] = 'JimChen\Yii2DotenvEditor\components\DotenvEditor';
+		Yii::$app->set('dotenveditor', $this->dotenvOptions);
     }
 
 	public function createTranslator()
