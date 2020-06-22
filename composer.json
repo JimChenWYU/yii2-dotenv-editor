@@ -11,10 +11,11 @@
     "require": {
         "php": ">=7.1",
         "yiisoft/yii2": "~2.0",
+        "yiisoft/yii2-bootstrap": "^2.0",
+        "bower-asset/vue": "^2.6",
         "sixlive/dotenv-editor": "^1.2",
-        "bower-asset/vue": "^2.6"
-    }
-    ,
+        "bower-asset/font-awesome": "^4.7"
+    },
     "require-dev": {
         "roave/security-advisories": "dev-master"
     },

@@ -10,12 +10,12 @@
         <div class="box-tools"> </div>
     </div>
     <div class="box-body" id="app">
-        <h1><a href="default/index"><?=Yii::t('dotenv', 'title')?></a></h1>
+        <h1><a href="<?= $url . '/index'?>"><?=Yii::t('dotenv', 'title')?></a></h1>
         <div class="row">
             <div class="col-md-12">
                 <ul class="nav nav-tabs">
-                    <li v-for="view in views" role="presentation" class="{{ view.active ? 'active' : '' }}">
-                        <a href="javascript:;" @click="setActiveView(view.name)">{{ view.name }}</a>
+                    <li v-for="view in views" role="presentation" :class="{ active : view.active }">
+                        <a href="javascript:void(0);" @click="setActiveView(view.name)">{{ view.name }}</a>
                     </li>
                 </ul>
             </div>
@@ -25,6 +25,12 @@
             <div class="col-md-12 col-sm-12">
                 <!-- Error-Container -->
                 <div>
+                    <div class="alert alert-warning" role="alert" v-show="alertwarning">
+                        <button type="button" class="close" @click="closeWarning" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        {{ alertmessage }}
+                    </div>
                     <div class="alert alert-success" role="alert" v-show="alertsuccess">
                         <button type="button" class="close" @click="closeAlert" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
@@ -32,12 +38,12 @@
                         {{ alertmessage }}
                     </div>
                     <!-- Errors from POST-Requests -->
-                    <?php if (Yii::$app->session->has('dotenv')):?>
+                    <?php if (Yii::$app->getSession()->hasFlash('dotenv')):?>
                     <div class="alert alert-success alert-dismissable" role="alert">
                         <button type="button" class="close" aria-label="Close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
-                        <?=Yii::$app->session->get('dotenv')?>
+                        <?=Yii::$app->getSession()->getFlash('dotenv')?>
                     </div>
                     <?php endif;?>
                 </div>
@@ -171,10 +177,10 @@
                             </h2>
                         </div>
                         <div class="panel-body">
-                            <a href="default/createbackup" class="btn btn-primary">
+                            <a href="/<?=$url?>/createbackup" class="btn btn-primary">
                             <?=Yii::t('dotenv', 'backup_create')?>
                             </a>
-                            <a href="default/download" class="btn btn-primary">
+                            <a href="/<?=$url?>/download" class="btn btn-primary">
                             <?=Yii::t('dotenv', 'backup_download')?>
                             </a>
                         </div>
@@ -215,13 +221,13 @@
                                         <a class="btn btn-success" href="javascript:;" @click="showBackupDetails('<?=$backup['unformatted']?>', '<?=$backup['formatted']?>')" title="<?=Yii::t('dotenv', 'backup_table_options_show')?>">
                                             <span class="fa fa-search-plus"></span>
                                         </a>
-                                        <a class="btn btn-warning" href="javascript:;" @click="restoreBackup(<?=$backup['unformatted']?>)" title="<?=Yii::t('dotenv', 'backup_table_options_restore')?>">
-                                            <span class="fa fa-refresh" title="{!! __('dotenv-editor::views.backup_table_options_restore') !!}"></span>
+                                        <a class="btn btn-warning" href="javascript:;" @click="restoreBackup('<?=$backup['unformatted']?>')" title="<?=Yii::t('dotenv', 'backup_table_options_restore')?>">
+                                            <span class="fa fa-refresh" title="<?=Yii::t('dotenv', 'backup_table_options_restore')?>"></span>
                                         </a>
-                                        <a class="btn btn-info" href="<?='default/download/' . $backup['unformatted']?>">
+                                        <a class="btn btn-info" href="<?=$url . '/download/' . $backup['unformatted']?>">
                                         <span class="fa fa-download" title="<?=Yii::t('dotenv', 'backup_table_options_download')?>"></span>
                                         </a>
-                                        <a onclick="return confirm('are you sure?')" class="btn btn-danger" href="<?='default/deletebackup/'.$backup["unformatted"]?>" title="<?=Yii::t('dotenv', 'backup_table_options_delete')?>">
+                                        <a onclick="return confirm('Are you sure?')" class="btn btn-danger" href="<?= $url.'/deletebackup/'.$backup["unformatted"]?>" title="<?=Yii::t('dotenv', 'backup_table_options_delete')?>">
                                         <span class="fa fa-trash"></span>
                                         </a>
                                     </td>
@@ -260,7 +266,7 @@
 
                                     <button type="button" class="btn btn-default" data-dismiss="modal"><?=Yii::t('dotenv', 'backup_modal_close')?></button>
 
-                                    <a onclick="return confirm('are you sure?')" href="<?='default/deletebackup/'.$backup["unformatted"]?>" class="btn btn-danger">
+                                    <a onclick="return confirm('are you sure?')" href="<?= $url . '/deletebackup/'.$backup["unformatted"]?>" class="btn btn-danger">
                                     <?=Yii::t('dotenv', 'backup_modal_delete')?>
                                     </a>
                                 </div>
@@ -282,7 +288,7 @@
                                     <?=Yii::t('dotenv', 'upload_warning')?>
                                 </span>
                             </p>
-                            <form method="post" action="default/upload" enctype="multipart/form-data">
+                            <form method="post" action="<?= $url . '/upload'?>" enctype="multipart/form-data">
                             <div class="form-group">
                                 <label for="backup"><?=Yii::t('dotenv', 'upload_label')?></label>
                                 <input type="file" name="backup">
@@ -303,33 +309,36 @@
 <script>
 new Vue({
     el: '#app',
-    data: {
-        loadButton: true,
-        alertsuccess: 0,
-        alertmessage: '',
-        views: [
-            {name: "<?=Yii::t('dotenv', 'overview')?>", active: 1},
-            {name: "<?=Yii::t('dotenv', 'addnew')?>", active: 0},
-            {name: "<?=Yii::t('dotenv', 'backups')?>", active: 0},
-            {name: "<?=Yii::t('dotenv', 'upload')?>", active: 0}
-        ],
-        newEntry: {
-            key: "",
-            value: ""
-        },
-        details: {},
-        currentBackup: {
-            timestamp: ''
-        },
-        toEdit: {},
-        toDelete: {},
-        deleteModal: {
-            title: '',
-            content: ''
-        },
-        token: "<?=Yii::$app->request->getCsrfToken()?>",
-        entries: [
-        ]
+    data: function () {
+        return {
+            loadButton: true,
+            alertsuccess: 0,
+            alertwarning:0,
+            alertmessage: '',
+            views: [
+                {name: "<?=Yii::t('dotenv', 'overview')?>", active: 1},
+                {name: "<?=Yii::t('dotenv', 'addnew')?>", active: 0},
+                {name: "<?=Yii::t('dotenv', 'backups')?>", active: 0},
+                {name: "<?=Yii::t('dotenv', 'upload')?>", active: 0}
+            ],
+            newEntry: {
+                key: "",
+                value: ""
+            },
+            details: {},
+            currentBackup: {
+                timestamp: ''
+            },
+            toEdit: {},
+            toDelete: {},
+            deleteModal: {
+                title: '',
+                content: ''
+            },
+            token: "<?=Yii::$app->request->getCsrfToken()?>",
+            entries: [
+            ]
+        }
     },
     filters: {
         hide: function(value, hide) {
@@ -375,18 +384,18 @@ new Vue({
                 url: "/<?=$url?>/add",
                 type: "post",
                 data: {
-                    _token: this.token,
+	                "<?=Yii::$app->request->csrfParam?>": this.token,
                     key: newkey,
                     value: newvalue
                 },
-                success: function(){
-                    vm.entries.push({
-                        key: newkey,
-                        value: newvalue
-                    });
-                    var msg = "<?=Yii::t('dotenv', 'new_entry_added')?>";
-                    vm.showAlert("success", msg);
-                    vm.alertsuccess = 1;
+                success: function(json){
+                    vm.entries = json.env
+                    if (json.warning) {
+                        vm.showWarning(json.warning)
+                    } else {
+                        var msg = "<?=Yii::t('dotenv', 'new_entry_added')?>";
+                        vm.showAlert("success", msg);
+                    }
                     $("#newkey").val("");
                     vm.newEntry.key = "";
                     vm.newEntry.value = "";
@@ -406,7 +415,7 @@ new Vue({
                 url: "/<?=$url?>/update",
                 type: "post",
                 data: {
-                    _token: this.token,
+                    "<?=Yii::$app->request->csrfParam?>": this.token,
                     key: vm.toEdit.key,
                     value: vm.toEdit.value
                 },
@@ -444,7 +453,7 @@ new Vue({
                     success: function(){
                         vm.loadEnv();
                         $('#showDetails').modal('hide');
-                        vm.setActiveView('overview');
+                        vm.setActiveView('<?=Yii::t('dotenv', 'overview')?>');
                         vm.showAlert('success', "<?=Yii::t('dotenv', 'backup_restored')?>");
                     }
                 })
@@ -457,7 +466,7 @@ new Vue({
                 url: "/<?=$url?>/delete",
                 type: "post",
                 data: {
-                    _token: this.token,
+                    "<?=Yii::$app->request->csrfParam?>": this.token,
                     key: entry.key
                 },
                 success: function(){
@@ -465,16 +474,26 @@ new Vue({
                     vm.showAlert("success", msg);
                 }
             });
-            this.entries.$remove(entry);
+            var index = this.entries.indexOf(entry)
+            this.entries.splice(index, 1);
             this.toDelete = {};
             $('#deleteModal').modal('hide');
         },
         showAlert: function(type, message){
             this.alertmessage = message;
             this.alertsuccess = 1;
+            this.alertwarning = 0;
         },
         closeAlert: function(){
             this.alertsuccess = 0;
+        },
+        showWarning: function (message) {
+            this.alertmessage = message;
+            this.alertsuccess = 0;
+            this.alertwarning = 1;
+        },
+        closeWarning: function(){
+            this.alertwarning = 0;
         },
         modal: function(entry){
             this.toDelete = entry;

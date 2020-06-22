@@ -6,8 +6,8 @@ use yii\base\Exception;
 
 class DotEnvException extends Exception
 {
-	public function getName()
-	{
-		return 'DotEnvException';
-	}
+    public function getName()
+    {
+        return 'DotEnvException';
+    }
 }
