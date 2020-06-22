@@ -1,6 +1,6 @@
 <h1 align="center"> yii2-dotenv-editor </h1>
 
-<p align="center"> A Yii2 package for editing the .env file dynamically..</p>
+<p align="center"> A Yii2 package for editing the .env file dynamically.</p>
 
 
 ## Installing
@@ -11,7 +11,23 @@ $ composer require jimchen/yii2-dotenv-editor -vvv
 
 ## Usage
 
-TODO
+```php
+[   
+    'modules' => [
+        'dotenv' => [
+            'class' => 'JimChen\Yii2DotenvEditor\Module',
+            'dotenvOptions' => [
+                'env' => '@app/.env',
+                'backupPath' => '@runtime/backups',
+                'autoBackup' => true,
+                'maxBackup'  => 10,
+            ],
+        ],           
+    ],
+];
+```
+
+Then you can open your Browser surface `http://host:port/dotenv`. Enjoy it!
 
 ## Contributing
 
