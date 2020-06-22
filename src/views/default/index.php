@@ -56,7 +56,7 @@
                         <div class="panel-body">
                             <p> <?=Yii::t('dotenv', 'overview_text')?> </p>
                             <p>
-                                <a href="javascript:;" v-show="loadButton" class="btn btn-primary" @click="loadEnv">
+                                <a href="javascript:;" class="btn btn-primary" @click="loadEnv">
                                     <?=Yii::t('dotenv', 'overview_button')?>
                                 </a>
                             </p>
@@ -294,7 +294,8 @@
                             <form method="post" action="<?= $url . '/upload'?>" enctype="multipart/form-data">
                             <?php
                             use yii\helpers\Html;
-                            $request = Yii::$app->getRequest();
+
+$request = Yii::$app->getRequest();
                             echo Html::hiddenInput($request->csrfParam, $request->getCsrfToken());
                             ?>
                             <div class="form-group">
@@ -320,7 +321,7 @@ new Vue({
     data: function () {
         return {
             loadButton: true,
-            hideEntries: false,
+            hideEntries: true,
             alertsuccess: 0,
             alertwarning:0,
             alertmessage: '',
@@ -357,6 +358,9 @@ new Vue({
             return value
         }
     },
+    created: function () {
+        this.loadEnv()
+    },
     mounted: function () {
         <?php if ($view = Yii::$app->getSession()->getFlash('active-view', false, true)):?>
         this.setActiveView("<?=$view?>")
@@ -368,7 +372,7 @@ new Vue({
             this.loadButton = false;
             $.getJSON("/<?=$url?>/getdetails", function(items){
                 vm.entries = items.map(item => {
-                    item.hide = false
+                    item.hide = vm.hideEntries
                     if (
                         item.key.toLowerCase().includes('key') ||
                         item.key.toLowerCase().includes('secret') ||
