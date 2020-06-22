@@ -26,6 +26,13 @@ class Module extends \yii\base\Module implements BootstrapInterface
 	public $dotenvOptions;
 
 	/**
+	 * the layout that should be applied for views within this module.
+	 *
+	 * @var string
+	 */
+	public $layout = 'main';
+
+	/**
 	 * @var string
 	 */
 	public $entry = 'index';

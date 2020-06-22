@@ -11,8 +11,6 @@ use JimChen\Yii2DotenvEditor\DotEnvException;
 
 class DefaultController extends Controller
 {
-    public $layout = 'main';
-
 	/**
 	 * @var \JimChen\Yii2DotenvEditor\Module the module that this controller belongs to.
 	 */
