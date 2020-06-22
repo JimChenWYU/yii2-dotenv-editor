@@ -65,7 +65,10 @@
                             <table class="table table-striped">
                                 <tr>
                                     <th><?=Yii::t('dotenv', 'overview_table_key')?></th>
-                                    <th><?=Yii::t('dotenv', 'overview_table_value')?></th>
+                                    <th >
+                                        <i class="fa fa-eye" @click="handleEntries()"></i>
+                                        <span><?=Yii::t('dotenv', 'overview_table_value')?></span>
+                                    </th>
                                     <th><?=Yii::t('dotenv', 'overview_table_options')?></th>
                                 </tr>
                                 <tr v-for="entry in entries">
@@ -317,6 +320,7 @@ new Vue({
     data: function () {
         return {
             loadButton: true,
+            hideEntries: false,
             alertsuccess: 0,
             alertwarning:0,
             alertmessage: '',
@@ -506,6 +510,13 @@ new Vue({
             this.deleteModal.title = "<?=Yii::t('dotenv', 'delete_entry')?>";
             this.deleteModal.content = entry.key + "=" + entry.value;
             $('#deleteModal').modal('show');
+        },
+        handleEntries: function () {
+            var vm = this
+            vm.hideEntries = !vm.hideEntries
+            vm.entries.map(function (entry) {
+                entry.hide = vm.hideEntries
+            })
         }
     }
 })
