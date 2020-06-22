@@ -2,17 +2,21 @@
 
 namespace JimChen\Yii2DotenvEditor\controllers;
 
-use JimChen\Yii2DotenvEditor\behaviors\ClearSessionBehavior;
-use JimChen\Yii2DotenvEditor\DotEnvException;
 use Yii;
 use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\web\UploadedFile;
+use JimChen\Yii2DotenvEditor\DotEnvException;
 
 class DefaultController extends Controller
 {
     public $layout = 'main';
+
+	/**
+	 * @var \JimChen\Yii2DotenvEditor\Module the module that this controller belongs to.
+	 */
+    public $module;
 
     /**
      * @var \JimChen\Yii2DotenvEditor\components\DotenvEditor
@@ -36,7 +40,7 @@ class DefaultController extends Controller
             $data['backups'] = false;
         }
         $data['url'] = Yii::$app->request->getPathInfo();
-        return $this->render('index', $data);
+        return $this->render($this->module->entry, $data);
     }
 
     /**

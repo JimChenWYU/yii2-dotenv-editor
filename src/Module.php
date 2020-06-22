@@ -26,6 +26,11 @@ class Module extends \yii\base\Module implements BootstrapInterface
 	 */
 	public $dotenvOptions;
 
+	/**
+	 * @var string
+	 */
+	public $entry = 'index';
+
     /**
      * @inheritDoc
      */
