@@ -13,6 +13,9 @@ $ composer require jimchen/yii2-dotenv-editor -vvv
 
 ```php
 [   
+    'bootstrap' => [
+        'dotenv',
+    ],
     'modules' => [
         'dotenv' => [
             'class' => 'JimChen\Yii2DotenvEditor\Module',
