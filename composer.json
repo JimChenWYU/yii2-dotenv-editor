@@ -24,8 +24,5 @@
         "psr-4": {
             "JimChen\\Yii2DotenvEditor\\": "src"
         }
-    },
-    "extra": {
-        "bootstrap": "JimChen\\Yii2DotenvEditor\\Module"
     }
 }
