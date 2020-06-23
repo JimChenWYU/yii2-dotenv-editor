@@ -2,7 +2,9 @@
 /**
  * @var array $backups
  * @var string $url
+ * @var \yii\web\View $this
  */
+$asset = JimChen\Yii2DotenvEditor\DotenvAsset::register($this);
 ?>
 <div class="box box-success box-solid">
     <div class="box-header">
@@ -313,7 +315,6 @@ $request = Yii::$app->getRequest();
         </div>
     </div> <!-- box body -->
 </div> <!-- box -->
-<?php /** @var \yii\web\View $this */?>
 <?php $this->beginBlock('dotenv-default-index') ?>
 <script>
 new Vue({

@@ -1,12 +1,9 @@
 <?php
 
-use yii\widgets\Menu;
 use yii\helpers\Html;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
-
-$asset = JimChen\Yii2DotenvEditor\DotenvAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
