@@ -7,6 +7,7 @@ use JimChen\Yii2DotenvEditor\DotEnvException;
 use JimChen\Yii2DotenvEditor\models\Backup;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
+use yii\helpers\FileHelper;
 use yii\helpers\Json;
 
 /**
@@ -44,12 +45,12 @@ final class DotenvEditor extends Component
 
     public function init()
     {
-	    if ($this->env === null) {
-		    throw new InvalidConfigException('Unknown DotenvEditor::class parameter `env`');
-	    }
-	    if ($this->backupPath === null) {
-		    throw new InvalidConfigException('Unknown DotenvEditor::class parameter `backupPath`');
-	    }
+        if ($this->env === null) {
+            throw new InvalidConfigException('Unknown DotenvEditor::class parameter `env`');
+        }
+        if ($this->backupPath === null) {
+            throw new InvalidConfigException('Unknown DotenvEditor::class parameter `backupPath`');
+        }
         $this->env = Yii::getAlias($this->env);
         $this->backupPath = rtrim(Yii::getAlias($this->backupPath), DIRECTORY_SEPARATOR);
         $this->editor = new \sixlive\DotenvEditor\DotenvEditor();
@@ -127,7 +128,7 @@ final class DotenvEditor extends Component
      */
     public function getBackupVersions($sort = SORT_ASC)
     {
-        $versions = array_diff(scandir($this->backupPath), array('..', '.'));
+        $versions = $this->scanBackupDir();
 
         if (count($versions) > 0) {
             $output = array();
@@ -140,15 +141,15 @@ final class DotenvEditor extends Component
                 ]);
                 $count++;
             }
-	        usort($output, function (Backup $a, Backup $b) use ($sort) {
-		        if ($a->unformatted === $b->unformatted) {
-			        return 0;
-		        }
-		        if ($sort === SORT_ASC) {
-		            return ($a->unformatted < $b->unformatted) ? -1 : 1;
-		        }
-		        return ($a->unformatted < $b->unformatted) ? 1 : -1;
-	        });
+            usort($output, function (Backup $a, Backup $b) use ($sort) {
+                if ($a->unformatted === $b->unformatted) {
+                    return 0;
+                }
+                if ($sort === SORT_ASC) {
+                    return ($a->unformatted < $b->unformatted) ? -1 : 1;
+                }
+                return ($a->unformatted < $b->unformatted) ? 1 : -1;
+            });
             return $output;
         }
         throw new DotEnvException(Yii::t('dotenv', 'no_backups_available'), 0);
@@ -286,7 +287,20 @@ final class DotenvEditor extends Component
      */
     protected function getBackupCount()
     {
-        return count(array_diff(scandir($this->backupPath), array('..', '.')));
+        return count($this->scanBackupDir());
+    }
+
+    /**
+     * @return array
+     * @throws \yii\base\Exception
+     */
+    protected function scanBackupDir()
+    {
+        if (!file_exists($this->backupPath)) {
+            @FileHelper::createDirectory($this->backupPath, 0775, true);
+        }
+
+        return array_diff(scandir($this->backupPath), array('..', '.'));
     }
 
     /**

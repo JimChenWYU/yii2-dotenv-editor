@@ -1,5 +1,6 @@
 {
     "name": "jimchen/yii2-dotenv-editor",
+    "type": "yii2-extension",
     "description": "A Yii2 package for editing the .env file dynamically.",
     "license": "MIT",
     "authors": [
@@ -23,5 +24,8 @@
         "psr-4": {
             "JimChen\\Yii2DotenvEditor\\": "src"
         }
+    },
+    "extra": {
+        "bootstrap": "JimChen\\Yii2DotenvEditor\\Module"
     }
 }
